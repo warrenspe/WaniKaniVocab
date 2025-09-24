@@ -169,7 +169,9 @@ def gen_apkg(vocab_dict):
                         '<div>Meanings:<br><div class="meanings">{{Meanings}}</div></div>'
                         '<p>Part of Speech: <b>{{PartOfSpeech}}</b></p>'
                         '<hr>'
-                        '<p>{{MeaningLong}}</p>',
+                        '<p>{{MeaningLong}}</p>'
+                        '<br><br>'
+                        '<div class="audio">{{Audio}}</div>',
             }
         ],
         css="""
@@ -177,7 +179,11 @@ def gen_apkg(vocab_dict):
             font-size: 13px;
         }
         .audio {
-          text-align: center;
+            text-align: center;
+        }
+        .replay-button svg {
+          width: 30px;
+          height: 30px;
         }
         .meanings {
             font-size: 16px;
