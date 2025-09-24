@@ -55,7 +55,7 @@ def get_last_cached():
 
 def set_last_cached(data):
     with open(os.path.join(args.data_directory, "last_cached.json"), "w") as fd:
-        return json.dump(data, fd, separators=(", ", ": "), indent=4)
+        json.dump(data, fd, separators=(", ", ": "), indent=4)
 
 
 def rate_limit(f):
@@ -116,7 +116,7 @@ def fetch_records():
 
         last_id = subjects['data'][-1]["id"]
         for vocab in subjects["data"]:
-            vocab_by_id[vocab['id']] = vocab
+            vocab_by_id[str(vocab['id'])] = vocab
 
     set_last_cached(vocab_by_id)
 
@@ -153,6 +153,7 @@ def gen_apkg(vocab_dict):
         "WaniVocab Audio Model",
         fields=[
             {"name": "Audio"},
+            {"name": "Kanji"},
             {"name": "Readings"},
             {"name": "PartOfSpeech"},
             {"name": "Meanings"},
@@ -160,13 +161,15 @@ def gen_apkg(vocab_dict):
         ],
         templates=[
             {
-                "name": "Card 1",
+                "name": 'Card 1',
                 "qfmt": '<div class="audio">{{Audio}}</div>',
-                "afmt": "<h1>{{Readings}}</h1>"
+                "afmt": '<h1>{{Kanji}}</h1>'
+                        '<hr>'
+                        '<h2>{{Readings}}</h2>'
                         '<div>Meanings:<br><div class="meanings">{{Meanings}}</div></div>'
-                        "<p>Part of Speech: <b>{{PartOfSpeech}}</b></p>"
-                        "<hr>"
-                        "<p>{{MeaningLong}}</p>"
+                        '<p>Part of Speech: <b>{{PartOfSpeech}}</b></p>'
+                        '<hr>'
+                        '<p>{{MeaningLong}}</p>',
             }
         ],
         css="""
@@ -195,6 +198,7 @@ def gen_apkg(vocab_dict):
             model=model,
             fields=[
                 f"[sound:wbvocab-{vocab_id}.mp3]",
+                vocab_data["data"]["characters"],
                 "<br>".join([f"<span>{r['reading']}</span>" for r in vocab_data["data"].get("readings", [])]),
                 ", ".join([pos for pos in vocab_data["data"].get("parts_of_speech", [])]),
                 "<br>".join([f"<span>{m['meaning']}</span>" for m in vocab_data["data"].get("meanings", []) + vocab_data["data"].get("auxiliary_meanings", [])]),
