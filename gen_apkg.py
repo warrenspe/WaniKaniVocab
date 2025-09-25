@@ -201,13 +201,20 @@ def gen_apkg(vocab_dict):
 
     for vocab_id, vocab_data in vocab_dict.items():
         note = genanki.Note(
+            guid=f"wkvocab{vocab_id}",
             model=model,
             fields=[
                 f"[sound:wbvocab-{vocab_id}.mp3]",
                 vocab_data["data"]["characters"],
                 "<br>".join([f"<span>{r['reading']}</span>" for r in vocab_data["data"].get("readings", [])]),
                 ", ".join([pos for pos in vocab_data["data"].get("parts_of_speech", [])]),
-                "<br>".join([f"<span>{m['meaning']}</span>" for m in vocab_data["data"].get("meanings", []) + vocab_data["data"].get("auxiliary_meanings", [])]),
+                "<br>".join([
+                    f"<span>{m['meaning']}</span>"
+                    for m in (
+                        [m for m in vocab_data["data"].get("meanings", []) if m.get('accepted_answer', True)] +
+                        [m for m in vocab_data["data"].get("auxiliary_meanings", []) if m.get('type') != 'blacklist']
+                    )
+                ]),
                 vocab_data["data"]["meaning_mnemonic"],
             ]
         )
